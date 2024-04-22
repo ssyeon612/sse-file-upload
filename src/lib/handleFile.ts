@@ -12,7 +12,7 @@ function handleFile({ uploadFile, path }: TFileInfo) {
   const json = JSON.stringify({
     workspaceId: 1,
     applicationName: "graphizer-global",
-    filePath: path ? path : "/upload-file",
+    filePath: "/work/Graphizer-Global/upload",
   });
   const blob = new Blob([json], {
     type: "application/json",

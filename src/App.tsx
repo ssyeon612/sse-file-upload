@@ -6,7 +6,7 @@ import parseData from "./lib/parseData";
 import handleFile from "./lib/handleFile";
 
 import ConfettiComponent from "./components/Confetti";
-import Memo from "./components/Memo";
+import Result from "./components/Result";
 
 export interface IFileDto {
   id?: string;
@@ -16,17 +16,20 @@ export interface IFileDto {
   filePath?: string | null;
 }
 
-// const uploadURL = "/api/admin-cms/v1/file/upload2";
-const uploadURL = "/api/admin-cms/v1/file/upload3";
+const defaultPath = "/work/Graphizer-Global/upload";
+
+const uploadURL = "/api/admin-cms/v1/file/upload2";
+// const uploadURL = "/api/admin-cms/v1/file/upload3";
 const cancelURL = "/api/admin-cms/v1/file/upload2-cancle";
 
 function App() {
   const [fileDto, setFileDto] = useState<IFileDto>({});
   const [file, setFile] = useState<File | null>(null);
-  const [filePath, setFilePath] = useState<String | null>(null);
+  const [filePath, setFilePath] = useState<string>(defaultPath);
   const [progress, setProgress] = useState<number>(0);
   const [byte, setByte] = useState<number>(0);
   const [totalByte, setTotalByte] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isDone, setIsDone] = useState<boolean>(false);
 
   const fileInput = useRef<HTMLInputElement>(null);
@@ -44,6 +47,7 @@ function App() {
       headers: { Accept: "text/event-stream" },
       body: payload,
       onmessage(event) {
+        setIsLoading(true);
         const data: IFileDto = parseData(event.data);
         setFileDto(data);
 
@@ -94,21 +98,36 @@ function App() {
     const target = e.target.files[0];
     setFile(target);
     setProgress(0);
+    setFilePath(`${filePath}/${target["name"]}`);
 
     uploadBtn.current?.classList.add("button--loading");
     e.target.value = "";
   };
 
+  const onChangeFilePath = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFilePath(e.target.value);
+  };
+
+  const onClickUpload = () => {
+    if (!isLoading) {
+      fileInput.current!.click();
+      setFilePath(defaultPath);
+    } else {
+      cancelBtn.current!.click();
+    }
+  };
+
   const resetBtn = () => {
     uploadBtn.current?.classList.remove("button--loading");
     buttonWrap.current?.classList.remove("on");
+    setIsLoading(false);
   };
 
   return (
     <>
       <div>
         <h1>File Upload</h1>
-        {fileDto.filePath && <Memo id={fileDto.id} filePath={fileDto.filePath} />}
+        <Result filePath={fileDto.filePath} />
         <div>
           <div className="progress-container">
             <div className="remain-byte">
@@ -117,15 +136,24 @@ function App() {
             <progress value={progress} max={100} />
           </div>
           <div className="upload-wrap">
-            <div className="text-box">
-              <span>저장 경로</span>
-              <input type="text" onChange={(e) => setFilePath(e.target.value)} />
+            <div className="form__group field">
+              <input
+                type="text"
+                className="form__field"
+                placeholder="저장 경로를 입력해 주세요."
+                id="name"
+                value={filePath}
+                onChange={onChangeFilePath}
+              />
+              <label htmlFor="name" className="form__label">
+                저장 경로
+              </label>
             </div>
             <p className="file-name">{file && file["name"]}</p>
             <input type="file" ref={fileInput} onChange={onChange} />
 
             <div className="btn-wrap" ref={buttonWrap}>
-              <button className="upload-btn" onClick={() => fileInput.current!.click()} ref={uploadBtn}>
+              <button className="upload-btn" onClick={onClickUpload} ref={uploadBtn}>
                 <svg
                   className="w-6 h-6 text-gray-800 dark:text-white svg"
                   aria-hidden="true"
