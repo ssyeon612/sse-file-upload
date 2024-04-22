@@ -50,7 +50,6 @@ function App() {
         const downloadedByte = data["downloadedByte"];
         const totalByte = data["totalByte"];
         const progress = data["progress"];
-        const id = data["id"];
         if (totalByte !== undefined) setTotalByte(totalByte);
         if (downloadedByte !== undefined) setByte(downloadedByte);
         if (progress !== undefined) setProgress(progress);
