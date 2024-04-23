@@ -4,7 +4,6 @@ import { fetchEventSource } from "@microsoft/fetch-event-source";
 
 import parseData from "./lib/parseData";
 import handleFile from "./lib/handleFile";
-import timer from "./lib/timer";
 
 import ConfettiComponent from "./components/Confetti";
 import Result from "./components/Result";
