@@ -18,8 +18,17 @@ progress {
   align-items: center;
   justify-content: center;
 }
-.remain-byte {
+.progress-percent {
+  position: absolute;
+  right: 0;
+  margin: 70px 10px 0 0;
+  font-weight: 700;
+  margin-right: 10px;
+  font-size: 1.1rem;
+  color: #dc3545;
+}
+.progress-bar {
   position: absolute;
   top: 40%;
-  font-weight: 600;
+  font-weight: 500;
 }

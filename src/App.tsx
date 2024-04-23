@@ -4,6 +4,7 @@ import { fetchEventSource } from "@microsoft/fetch-event-source";
 
 import parseData from "./lib/parseData";
 import handleFile from "./lib/handleFile";
+import timer from "./lib/timer";
 
 import ConfettiComponent from "./components/Confetti";
 import Result from "./components/Result";
@@ -31,11 +32,17 @@ function App() {
   const [totalByte, setTotalByte] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isDone, setIsDone] = useState<boolean>(false);
+  const [timer, setTimer] = useState<number>(0);
 
   const fileInput = useRef<HTMLInputElement>(null);
   const buttonWrap = useRef<HTMLDivElement>(null);
   const uploadBtn = useRef<HTMLButtonElement>(null);
   const cancelBtn = useRef<HTMLButtonElement>(null);
+
+  let tick: any;
+
+  const timerStart = () => (tick = setInterval(countTime, 1000));
+  const countTime = () => setTimer((preTimer) => preTimer + 1);
 
   // 파일 업로드
   const fileUpload = async () => {
@@ -46,18 +53,24 @@ function App() {
       method: "POST",
       headers: { Accept: "text/event-stream" },
       body: payload,
-      onmessage(event) {
+      async onopen(response) {
+        console.log("onopen:: {}", response);
+        timerStart();
+      },
+      onmessage(msg) {
         setIsLoading(true);
-        const data: IFileDto = parseData(event.data);
+        const data: IFileDto = parseData(msg.data);
         setFileDto(data);
-
         const downloadedByte = data["downloadedByte"];
         const totalByte = data["totalByte"];
-        const progress = data["progress"];
-        if (totalByte !== undefined) setTotalByte(totalByte);
-        if (downloadedByte !== undefined) setByte(downloadedByte);
-        if (progress !== undefined) setProgress(progress);
-        if (progress === 100) setIsDone(true);
+        let percent = 0;
+        if (totalByte !== undefined && downloadedByte !== undefined) {
+          percent = (downloadedByte / totalByte) * 100;
+          setTotalByte(totalByte);
+          setByte(downloadedByte);
+          setProgress(percent);
+        }
+        if (percent === 100) setIsDone(true);
       },
       onclose() {
         console.log("Connection closed");
@@ -98,6 +111,8 @@ function App() {
     const target = e.target.files[0];
     setFile(target);
     setProgress(0);
+    setTimer(0);
+    setIsDone(false);
     setFilePath(`${filePath}/${target["name"]}`);
 
     uploadBtn.current?.classList.add("button--loading");
@@ -118,6 +133,10 @@ function App() {
   };
 
   const resetBtn = () => {
+    // 타이머 종료
+    clearInterval(tick);
+
+    // 로딩 종료
     uploadBtn.current?.classList.remove("button--loading");
     buttonWrap.current?.classList.remove("on");
     setIsLoading(false);
@@ -130,10 +149,13 @@ function App() {
         <Result filePath={fileDto.filePath} />
         <div>
           <div className="progress-container">
-            <div className="remain-byte">
-              {byte} byte / {totalByte} byte
+            <div className="progress-bar">
+              {byte} bytes / {totalByte} bytes
             </div>
             <progress value={progress} max={100} />
+            <div className="progress-percent">
+              {Math.ceil(progress * 10) / 10}% | {timer}초
+            </div>
           </div>
           <div className="upload-wrap">
             <div className="form__group field">
