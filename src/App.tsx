@@ -129,7 +129,7 @@ function App() {
     e.target.value = "";
 
     // 로딩 스피너 on
-    uploadBtn.current?.classList.add("button--loading");
+    uploadBtn.current?.classList.add("btn--loading");
   };
 
   const onChangeFilePath = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -149,7 +149,7 @@ function App() {
     clearInterval(tick);
 
     // 로딩 스피너 off
-    uploadBtn.current?.classList.remove("button--loading");
+    uploadBtn.current?.classList.remove("btn--loading");
     buttonWrap.current?.classList.remove("on");
     setIsLoading(false);
   };
@@ -181,8 +181,8 @@ function App() {
           <input type="file" ref={fileInput} onChange={onChange} />
 
           {/* 업로드, 취소 버튼 */}
-          <div className="btn-wrap" ref={buttonWrap}>
-            <button className="upload-btn" onClick={onClickUpload} ref={uploadBtn}>
+          <div className="btn--wrap" ref={buttonWrap}>
+            <button className="btn__upload" onClick={onClickUpload} ref={uploadBtn}>
               <svg
                 className="w-6 h-6 text-gray-800 dark:text-white svg"
                 aria-hidden="true"
@@ -198,9 +198,9 @@ function App() {
                   clipRule="evenodd"
                 />
               </svg>
-              <span className="button__text">Upload File</span>
+              <span className="btn__text">Upload File</span>
             </button>
-            <button className="cancel-btn" ref={cancelBtn} onClick={handleCancel}>
+            <button className="btn__cancel" ref={cancelBtn} onClick={handleCancel}>
               <svg
                 className="w-6 h-6 text-gray-800 dark:text-white"
                 aria-hidden="true"

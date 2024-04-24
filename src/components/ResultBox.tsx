@@ -6,8 +6,8 @@ function ResultBox({ filePath }: IFileDto) {
     alert("경로가 복사되었습니다.");
   };
   return (
-    <div className="result-container">
-      <div className="copy">
+    <div className="result-wrap">
+      <div className="btn__copy">
         <span onClick={handleClick}>Copy</span>
       </div>
       <p>
