@@ -9,10 +9,14 @@ function handleFile({ uploadFile, path }: TFileInfo) {
   if (uploadFile instanceof File) {
     formData.append("csvFile", uploadFile);
   }
+  
+  // 파일 request 경로만 추출
+  const newPath = path?.replace(`/${uploadFile["name"]}`, "");
+
   const json = JSON.stringify({
     workspaceId: 1,
     applicationName: "graphizer-global",
-    filePath: "/work/Graphizer-Global/upload",
+    filePath: newPath,
   });
   const blob = new Blob([json], {
     type: "application/json",
